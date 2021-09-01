@@ -1,66 +1,62 @@
 #include <iostream>
-#include <stdlib.h>
 #include <sys/time.h>
-#include <cmath>
+#include <stdlib.h>
+
+#define MAX 800
+int determinante(int matriz[][MAX], int);
 
 
-float det(float **m, int n){
-    float pivote, pivote1, determinante,aux;
-    for(int i = 0; i < n; i++){
-        pivote = m[i][i];
-        for(int j = i+1; j<n; j++){
-            pivote1 = m[j][i];
-            aux = pivote1/pivote;
-            for(int k = 0; k < n; k++){
-                m[j][k]=m[j][k]-aux*m[i][k];
-            }
-        }
-    }
+void llenarMatriz(int matriz[][MAX], int orden, int inferior, int superior);
+int main(int argc, char** argv)
+{
+    int matriz[MAX][MAX];
+    int orden = atoi(argv[1]);
+    int inferior = atoi(argv[2]);
+    int superior = atoi(argv[3]);
+    llenarMatriz(matriz, orden, inferior, superior);
 
-    for(int i = 0; i < n; i ++){
-        determinante*=m[i][i];
-    }
-    return determinante;
-}
+    struct timeval begin, end;
 
+    gettimeofday(&begin, 0);
 
-int main(void){
-    int n,a,b;
-    float **matriz = (float **)malloc(n * sizeof(float *));
+    int det = determinante(matriz, orden);
 
-    std::cout << "Elija orden de la matriz: ";
-    std::cin >> n;
-    std::cout << "INF: ";
-    std::cin >> a;
-    std::cout << "SUP: ";
-    std::cin >> b;
-    for(int i = 0; i < n; i++){
-        matriz[i] = (float *)malloc(n* sizeof(float *));
-    }
+    gettimeofday(&end, 0);
 
-    srand(time(NULL));
+    long segundos = end.tv_sec - begin.tv_sec;
+    long microsegundos = end.tv_usec - begin.tv_usec;
+    double elapsed = segundos + microsegundos*1e-6;
 
-    for(int y = 0; y < n; y++){
-        for(int w = 0; w<n; w++){
-            matriz[y][w] = rand() * ((float)b- (float)a) / (float)RAND_MAX;
-        }
-    }
-
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            std::cout << matriz[i][j] << " - ";
-        }
-        std::cout << std::endl;
-    }
-    float d= det(matriz,n);
-    std::cout << "Determinante: " << d;
-    std::cout << std::endl;
-    for(int i=0; i<n; i++){
-        for(int j=0; j<n; j++){
-            std::cout << matriz[i][j] << " - ";
-        }
-        std::cout << std::endl;
-    }
-
+    std::cout << orden << "\t" << elapsed << std::endl;
     return 0;
 }
+
+
+void llenarMatriz(int matriz[][MAX], int orden, int inferior, int superior){
+    srand(time(NULL));
+    for(int i = 0; i < orden; i ++){
+        for(int j = 0; j < orden; j ++){
+            matriz[i][j] = rand() % 100;
+        }
+    }
+}
+
+int determinante(int matriz[][MAX], int orden){
+    int det = matriz[0][0];
+
+    for(int k = 0;k < orden-1;k++)
+    {
+        int l = k + 1;
+        for(int i = l; i <orden; i++)
+        {
+            for(int j = l; j <orden; j++)
+            {
+                matriz[i][j] = (matriz[k][k] * matriz[i][j] - matriz[k][j] * matriz[i][k]) / matriz[k][k];
+            }
+            det = det * matriz[k+1][k+1];
+        } 
+    }
+    return det;
+} 
+
+
