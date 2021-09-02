@@ -2,24 +2,28 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#define MAX 800
-int determinante(int matriz[][MAX], int);
+long long determinante(long** matriz, int);
 
 
-void llenarMatriz(int matriz[][MAX], int orden, int inferior, int superior);
+void llenarMatriz(long** matriz, int orden, int inferior, int superior);
 int main(int argc, char** argv)
 {
-    int matriz[MAX][MAX];
+    long **matriz = NULL;
     int orden = atoi(argv[1]);
     int inferior = atoi(argv[2]);
     int superior = atoi(argv[3]);
+
+    matriz=(long **)malloc(orden * sizeof(long *));
+    for(int i = 0; i < orden; i++){
+        matriz[i] = (long *)malloc(orden * sizeof(long *));
+    }
     llenarMatriz(matriz, orden, inferior, superior);
 
     struct timeval begin, end;
 
     gettimeofday(&begin, 0);
 
-    int det = determinante(matriz, orden);
+    long long det = determinante(matriz, orden);
 
     gettimeofday(&end, 0);
 
@@ -28,11 +32,12 @@ int main(int argc, char** argv)
     double elapsed = segundos + microsegundos*1e-6;
 
     std::cout << orden << "\t" << elapsed << std::endl;
+    delete matriz;
     return 0;
 }
 
 
-void llenarMatriz(int matriz[][MAX], int orden, int inferior, int superior){
+void llenarMatriz(long** matriz, int orden, int inferior, int superior){
     srand(time(NULL));
     for(int i = 0; i < orden; i ++){
         for(int j = 0; j < orden; j ++){
@@ -41,22 +46,29 @@ void llenarMatriz(int matriz[][MAX], int orden, int inferior, int superior){
     }
 }
 
-int determinante(int matriz[][MAX], int orden){
-    int det = matriz[0][0];
+long long determinante(long** matriz, int orden){
+    int i, j, k;
+    long long det;
+    int factor;
 
-    for(int k = 0;k < orden-1;k++)
-    {
-        int l = k + 1;
-        for(int i = l; i <orden; i++)
-        {
-            for(int j = l; j <orden; j++)
-            {
-                matriz[i][j] = (matriz[k][k] * matriz[i][j] - matriz[k][j] * matriz[i][k]) / matriz[k][k];
-            }
-            det = det * matriz[k+1][k+1];
-        } 
+    if(orden == 1){
+        return matriz[0][0];
     }
+    for (k = 0; k < orden-1; k++){
+        for(i = k+1; i < orden; i++){
+            factor = matriz[i][k]/matriz[k][k];
+            for (j = k+1; j < orden; j++){
+                matriz[i][j] = matriz[i][j] - factor * matriz[k][j];
+            }
+        }
+    }
+    det = 1;
+    for(i = 0; i < orden; i ++){
+        det = det * matriz[i][i];
+    }
+
     return det;
+    
 } 
 
 
