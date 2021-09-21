@@ -53,6 +53,8 @@ long long determinante(long** matriz, int orden){
 
     if(orden == 1){
         return matriz[0][0];
+    } else if(orden == 2){
+        return matriz[0][0] * matriz[1][1] - matriz[0][1] * matriz[1][0];
     }
     for (k = 0; k < orden-1; k++){
         for(i = k+1; i < orden; i++){
